@@ -20,7 +20,7 @@ set_seed(86)
 # =========================
 # 1. 数据准备
 # =========================
-data_array = 'data/time_series.npy' 
+data_array = 'data/normal_time_series.npy' 
 time_series_array = np.load(data_array)
 time_series = torch.tensor(time_series_array, dtype=torch.float32)
 
@@ -197,7 +197,7 @@ def predict_future(model, init_seq, steps):
 
     return torch.stack(outputs)
 
-future_steps = 200
+future_steps = 100
 init_seq = data[-seq_len:]
 
 future = predict_future(model, init_seq, future_steps)
@@ -210,24 +210,49 @@ data_original = data * std + mean
 
 print("Future shape:", future.shape)
 print("Future Predictions (first 5):")
-print(future[:5])
+future_five_tensor = future[:5]
+print(future_five_tensor)
+
+red_balls_tensor = ((future_five_tensor[:, :-1] + 1) * 32 / 2 + 1).round().int()
+blue_ball_tensor = ((future_five_tensor[:, -1:] + 1) * 15 / 2 + 1).round().int()
+
+
+print("Red Balls (first 5 predictions):")
+print(red_balls_tensor)
+print("Blue Ball (first 5 predictions):")           
+print(blue_ball_tensor)
+
+
 
 # =========================
 # 10. 可视化
 # =========================
-plt.figure(figsize=(16, 4))
 
-plt.plot(data_original[:, 0].numpy(), label="True")
+num_dims = data_original.shape[1]
 
-start = len(data_original)
-plt.plot(
-    range(start, start + future_steps),
-    future[:, 0].numpy(),
-    label="Future",
-    linestyle="dashed"
-)
+plt.figure(figsize=(16, 12))
 
-plt.legend()
-plt.title("Conv + Transformer Prediction")
+for d in range(num_dims):
+    plt.subplot(num_dims, 1, d + 1)
+
+    # 真实数据
+    plt.plot(
+        data_original[train_size:, d].numpy(),
+        label="Real"
+    )
+
+    # 预测数据
+    start = len(data_original) - train_size
+    plt.plot(
+        range(start, start + future_steps),
+        future[:, d].numpy(),
+        linestyle="dashed",
+        label="Future"
+    )
+
+    plt.title(f"Ball {d+1}")
+    plt.legend()
+
+plt.tight_layout()
 plt.savefig("data/convtrans_prediction.png", dpi=300)
 plt.show()

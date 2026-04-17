@@ -6,7 +6,7 @@ import numpy as np
 # =========================
 # 1. 数据准备
 # =========================
-data_array = 'data/time_series.npy' 
+data_array = 'data/normal_time_series.npy' 
 time_series_array = np.load(data_array)
 time_series = torch.tensor(time_series_array, dtype=torch.float32)
 
@@ -161,19 +161,33 @@ data_original = data * std + mean
 # =========================
 # 9. 可视化（第0维）
 # =========================
-plt.figure(figsize=(16, 4))
+num_dims = data_original.shape[1]
 
-plt.plot(data_original[:, 0].numpy(), label="True")
+plt.figure(figsize=(16, 12))
 
-start = len(data_original)
-plt.plot(
-    range(start, start + future_steps),
-    future[:, 0].numpy(),
-    label="Future",
-    linestyle="dashed"
-)
+for d in range(num_dims):
+    plt.subplot(num_dims, 1, d + 1)
 
-plt.legend()
-plt.title("LSTM + Attention Prediction")
-plt.savefig("attention_prediction.png", dpi=300)
+    # 真实数据
+    plt.plot(
+        data_original[train_size:, d].numpy(),
+        label="Real"
+    )
+
+    # 预测数据
+    start = len(data_original) - train_size
+    plt.plot(
+        range(start, start + future_steps),
+        future[:, d].numpy(),
+        linestyle="dashed",
+        label="Future"
+    )
+
+    plt.title(f"Dimension {d}")
+    plt.legend()
+
+plt.tight_layout()
+plt.savefig("data/convtrans_prediction.png", dpi=300)
 plt.show()
+
+

@@ -125,5 +125,5 @@ plt.plot(
 
 plt.legend()
 plt.title("Reservoir Computing Time Series Prediction")
-plt.savefig("esn_prediction.png", dpi=300)
+plt.savefig("result/esn_prediction.png", dpi=300)
 plt.show()

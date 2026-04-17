@@ -160,5 +160,5 @@ plt.plot(
 
 plt.legend()
 plt.title("LSTM Time Series Prediction")
-plt.savefig("lstm_prediction.png", dpi=300)
+plt.savefig("result/lstm_prediction.png", dpi=300)
 plt.show()
